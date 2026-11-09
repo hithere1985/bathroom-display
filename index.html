@@ -101,7 +101,13 @@
     const snow = (code >= 71 && code <= 77) || code === 85 || code === 86;
     return snow ? "Snow expected · " + pop + "% chance" : pop >= 40 ? "Bring an umbrella · " + pop + "% rain" : "No umbrella · " + pop + "% rain";
   }
-  const hr12 = s => new Date(s).toLocaleTimeString("en-US", { hour: "numeric" }).replace(":00", "");
+  // Open-Meteo returns local times as "YYYY-MM-DDTHH:MM" in TZ. Format the text directly
+  // so the result does not depend on the time zone of the machine rendering the page.
+  function clock12(s, withMin) {
+    const h = +s.slice(11, 13), m = s.slice(14, 16);
+    return (h % 12 || 12) + (withMin ? ":" + m : "") + " " + (h < 12 ? "AM" : "PM");
+  }
+  const hr12 = s => clock12(s, false);
 
   // ===== Weather =====
   const url = "https://api.open-meteo.com/v1/forecast?latitude=" + LAT + "&longitude=" + LON +
@@ -114,7 +120,7 @@
     const c = w.current, D = w.daily, H = w.hourly, R = Math.round;
     const hi = D.temperature_2m_max.map(R), lo = D.temperature_2m_min.map(R);
     const pop = D.precipitation_probability_max.map(v => v ?? 0);
-    const sunset = new Date(D.sunset[0]).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", timeZone: TZ });
+    const sunset = clock12(D.sunset[0], true);
 
     // Next four 3-hour slots starting at the next full hour
     const i0 = Math.max(0, H.time.indexOf(c.time.slice(0, 13) + ":00")) + 1;
