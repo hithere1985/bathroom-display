@@ -50,8 +50,6 @@
   .day .ft { position: absolute; left: 0; right: 0; top: 10px; display: flex; justify-content: center; align-items: center; gap: 6px; }
   .day .ft svg { width: 28px; height: 28px; }
   .day .p { font-size: 13px; font-weight: 700; color: #5C5C5C; line-height: 1; }
-  .frz { position: absolute; left: 0; right: 0; border-top: 1px dashed #111; }
-  .frzl { position: absolute; left: -28px; width: 24px; text-align: right; font-size: 10px; font-weight: 700; transform: translateY(-50%); }
   .err { font-size: 20px; font-weight: 700; padding: 120px 0; text-align: center; }
 </style>
 </head>
@@ -134,8 +132,6 @@
     const Y = v => 64 + 120 * (yMax - v) / (yMax - yMin);
 
     let week = "";
-    if (32 >= yMin && 32 <= yMax)
-      week += '<div class="frz" style="top:' + Y(32) + 'px"></div><div class="frzl" style="top:' + Y(32) + 'px">32°</div>';
     for (let i = 1; i < 7; i++) {
       const nm = new Date(D.time[i] + "T12:00:00").toLocaleDateString("en-US", { weekday: "short" });
       week += '<div class="day">' +
