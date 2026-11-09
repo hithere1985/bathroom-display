@@ -14,7 +14,8 @@
   /* Header */
   .head { display: flex; justify-content: space-between; align-items: baseline; height: 34px; }
   .date { font-size: 24px; font-weight: 800; letter-spacing: -0.5px; line-height: 1; }
-  .upd { font-size: 12px; font-weight: 600; color: #5C5C5C; }
+  .clock { font-size: 24px; font-weight: 800; letter-spacing: -0.5px; line-height: 1; }
+  .clock span { font-size: 14px; font-weight: 700; letter-spacing: 0; margin-left: 4px; }
   .rule { height: 2px; background: #111; }
   .rule.thin { height: 1px; }
 
@@ -59,7 +60,7 @@
 <body>
   <div class="head">
     <div class="date" id="dt"></div>
-    <div class="upd" id="upd"></div>
+    <div class="clock" id="clk"></div>
   </div>
   <div class="rule"></div>
   <div id="body"><div class="err">Loading weather…</div></div>
@@ -67,11 +68,15 @@
 <script>
   // ===== SETTINGS =====
   const LAT = 43.3178, LON = -88.3790, TZ = "America/Chicago";   // Hartford, WI
+  const CLOCK_AHEAD_MIN = 5;   // set to about half the screen's refresh interval
 
-  // ===== Date and update stamp =====
-  const d0 = new Date();
+  // ===== Date and approximate clock =====
+  // The screen only refreshes every few minutes, so the clock runs ahead by
+  // CLOCK_AHEAD_MIN to stay within +/- that many minutes of the real time.
+  const d0 = new Date(Date.now() + CLOCK_AHEAD_MIN * 60000);
   document.getElementById("dt").textContent = d0.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", timeZone: TZ });
-  document.getElementById("upd").textContent = "Updated " + d0.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", timeZone: TZ });
+  const tp = d0.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", timeZone: TZ }).split(" ");
+  document.getElementById("clk").innerHTML = "~" + tp[0] + "<span>" + (tp[1] || "") + "</span>";
 
   // ===== Icons =====
   const CH = '<path d="M18 38h28a10 10 0 0 0 0-20 14 14 0 0 0-27-2A11 11 0 0 0 18 38z" fill="#fff"/>';
@@ -129,11 +134,11 @@
                '<div class="v">' + R(H.temperature_2m[j]) + '°</div><div class="p' + (p >= 40 ? " wet" : "") + '">' + p + '%</div></div>';
     }
 
-    // Range bars for the next six days on one shared scale (bar zone 60-184px within the row)
+    // Range bars for the next six days on one shared scale (bar zone 64-184px within the row)
     const wh = hi.slice(1), wl = lo.slice(1);
     let yMin = Math.min(...wl), yMax = Math.max(...wh);
     if (yMax - yMin < 20) { const mid = (yMax + yMin) / 2; yMin = mid - 10; yMax = mid + 10; }
-    const Y = v => 60 + 124 * (yMax - v) / (yMax - yMin);
+    const Y = v => 64 + 120 * (yMax - v) / (yMax - yMin);
 
     let week = "";
     if (32 >= yMin && 32 <= yMax)
