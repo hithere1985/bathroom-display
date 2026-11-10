@@ -62,7 +62,7 @@
 
 <script>
   // ===== SETTINGS =====
-  const LAT = 43.3178, LON = -88.3790, TZ = "America/Chicago";   // Hartford, WI
+  const LAT = 37.3595, LON = 127.1052, TZ = "Asia/Seoul";   // Bundang-gu, Seongnam
 
   // ===== Date =====
   // No clock: the screen refreshes only every 30 minutes, so a time would be stale.
@@ -93,9 +93,9 @@
   const svg = (c, day) => '<svg viewBox="0 0 64 64" fill="none" stroke="#111" stroke-width="4" stroke-linejoin="round">' + IC[key(c, day)] + '</svg>';
   const LBL = {0:"Clear",1:"Mostly clear",2:"Partly cloudy",3:"Cloudy",45:"Fog",48:"Freezing fog",51:"Light drizzle",53:"Drizzle",55:"Heavy drizzle",56:"Freezing drizzle",57:"Freezing drizzle",61:"Light rain",63:"Rain",65:"Heavy rain",66:"Freezing rain",67:"Freezing rain",71:"Light snow",73:"Snow",75:"Heavy snow",77:"Snow grains",80:"Showers",81:"Showers",82:"Heavy showers",85:"Snow showers",86:"Heavy snow",95:"Thunderstorms",96:"Storms, hail",99:"Storms, hail"};
 
-  // What to wear, from today's forecast (same thresholds as before)
+  // What to wear, from today's forecast (°C; converted from the old 20/35/55/70 °F thresholds)
   function wear(hi, lo) {
-    return lo < 20 ? "Heavy coat" : lo < 35 ? "Coat" : hi < 55 ? "Jacket" : hi < 70 ? "Light layer" : "Short sleeves";
+    return lo < -7 ? "Heavy coat" : lo < 2 ? "Coat" : hi < 13 ? "Jacket" : hi < 21 ? "Light layer" : "Short sleeves";
   }
   function wet(pop, code) {
     const snow = (code >= 71 && code <= 77) || code === 85 || code === 86;
@@ -114,7 +114,7 @@
     "&current=temperature_2m,apparent_temperature,weather_code,is_day" +
     "&hourly=temperature_2m,precipitation_probability,weather_code,is_day" +
     "&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,sunset" +
-    "&temperature_unit=fahrenheit&timezone=" + encodeURIComponent(TZ) + "&forecast_days=7";
+    "&temperature_unit=celsius&timezone=" + encodeURIComponent(TZ) + "&forecast_days=7";
 
   fetch(url).then(r => r.json()).then(w => {
     const c = w.current, D = w.daily, H = w.hourly, R = Math.round;
@@ -134,7 +134,7 @@
     // Range bars for the next six days on one shared scale (bar zone 64-184px within the row)
     const wh = hi.slice(1), wl = lo.slice(1);
     let yMin = Math.min(...wl), yMax = Math.max(...wh);
-    if (yMax - yMin < 20) { const mid = (yMax + yMin) / 2; yMin = mid - 10; yMax = mid + 10; }
+    if (yMax - yMin < 11) { const mid = (yMax + yMin) / 2; yMin = mid - 5.5; yMax = mid + 5.5; }
     const Y = v => 64 + 120 * (yMax - v) / (yMax - yMin);
 
     let week = "";
